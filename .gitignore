@@ -1,5 +1,6 @@
 #Temp files
 *~
+*.bak
 
 #Compiled Headers
 *.gch

@@ -23,14 +23,14 @@ bool Lexicon::LoadWords(const std::string& filename){
     return false;
   }
   while (true){
-    if (root == NULL) std::cout << "root is NULL." << std::endl;
+    //if (root == NULL) std::cout << "root is NULL." << std::endl;
     std::string word;
     std::getline(wordlist, word);
     if (!wordlist) break;
     //std::cout << "Adding word " << word << std::endl;
     AddWord(word, root);
   }
-  std::cout << "Added " << wordCount << " words to the lexicon." << std::endl;
+  //std::cout << "Added " << wordCount << " words to the lexicon." << std::endl;
   return true;
 }
 
@@ -68,4 +68,45 @@ bool Lexicon::CheckPathForWord(const std::string& word, Node *last){
   char first = tolower(word[0]);
   Node *next = last->nextLetters[ first - 'a' ];
   return CheckPathForWord(word.substr(1), next);
+}
+
+//Lookup words in lexicon by pattern.
+std::vector<std::string> Lexicon::MatchesForPattern(const std::string& pattern){
+  std::string empty = "";
+  return CheckPattern(pattern, empty, root);
+}
+
+std::vector<std::string> Lexicon::CheckPattern(const std::string& pattern, const std::string& built,  Node *last){
+  //std::cout << "CheckPattern for pattern \"" << pattern << "\"" << std::endl;
+  std::vector<std::string> matches; //vector of matching strings
+  if (last == NULL) return matches; //Return empty vector.
+  if (pattern == ""){
+    if (last->isWord) matches.push_back( built );
+    return matches;
+  }
+
+  //Otherwise, we continue pattern matching.
+  char first = tolower(pattern[0]);
+  if (first == '-') {
+    for (char i=0; i < NUM_CHILDREN; ++i){
+      char letter = 'a' + i;
+      std::string clone = built;
+      clone.append(&letter, 1);
+      //Add each string contained in a subtree to our vector.
+      for (std::string s : CheckPattern(pattern.substr(1), clone, last->nextLetters[i])){
+	//std::cout << "\tAdding \"" << s << "\"" << std::endl;
+	matches.push_back(s);
+      }
+    } 
+  }
+  else {
+    Node *next = last->nextLetters[ first - 'a' ];
+    std::string clone = built;
+    clone.append(&first, 1);
+    for (std::string s : CheckPattern(pattern.substr(1), clone, next)){
+      //std::cout << "\tAdding \"" << s << "\"" << std::endl;
+      matches.push_back(s);
+    }
+  }
+  return matches;
 }

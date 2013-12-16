@@ -1,4 +1,4 @@
-#include <map>  //Include vector
+#include <vector>  //Include vector
 
 #define NUM_CHILDREN 26
 
@@ -15,8 +15,10 @@ public:
   bool LoadWords(const std::string& filename); //Load words into the internal representation.
   void AddWord(const std::string& word, Node *last);
   bool ContainsWord(const std::string& word);
+  std::vector<std::string> MatchesForPattern(const std::string& pattern);
 private:
   bool CheckPathForWord(const std::string& word, Node *last);
+  std::vector<std::string> CheckPattern(const std::string& pattern, const std::string& built, Node *last);
   Node *root;
   int wordCount; //Count of words in the Lexicon.
 };
